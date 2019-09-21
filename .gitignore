@@ -2,3 +2,6 @@
 /.project
 .idea**
 CeleryRust.iml
+**/*.rs.bk
+**.lock
+**.iml
