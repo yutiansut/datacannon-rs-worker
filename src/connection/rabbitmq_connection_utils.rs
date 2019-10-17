@@ -5,8 +5,8 @@ use amiquip::{Channel, Connection, Exchange, Publish, Result};
 
 //Connection object
 pub struct RabbitMQConnection{
-    connection: Connection,
-    channel: Channel,
+    pub connection: Connection,
+    pub channel: Channel,
 }
 
 
@@ -14,10 +14,10 @@ pub struct RabbitMQConnection{
 impl RabbitMQConnection{
 
     /// Close the connection. Returns whether the connection was closed
-    fn close(self) -> bool {
+    pub fn close(self) -> bool {
         let mut result = self.channel.close();
         if(result.is_ok()){
-            result = self.connection.close()
+            result = self.connection.close();
             if(result.is_ok()){
                 true
             }else{
@@ -33,23 +33,10 @@ impl RabbitMQConnection{
 #[cfg(test)]
 mod tests {
 
-    #[test]
-    fn should_create_connection(){
-
-    }
+    use super::*;
 
     #[test]
-    fn should_publish_message(){
-
-    }
-
-    #[test]
-    fn should_bind_and_wait_for_message(){
-
-    }
-
-    #[test]
-    fn should_close_connection(){
+    fn should_close_a_connection(){
 
     }
 }

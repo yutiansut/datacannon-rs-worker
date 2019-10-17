@@ -1,6 +1,8 @@
 pub mod backend;
 pub mod broker;
 pub mod connection;
-pub mod message;
+pub mod json;
+pub mod queue;
 pub mod task;
 pub mod worker;
+pub mod config;
