@@ -114,14 +114,4 @@ mod tests {
         let m = copt.unwrap();
         let a = m.lock().unwrap();
     }
-
-    #[test]
-    fn should_create_an_exchange_if_needed(){
-
-    }
-
-    #[test]
-    fn test_should_create_connection_and_channel(){
-
-    }
 }

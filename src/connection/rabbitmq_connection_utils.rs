@@ -28,15 +28,3 @@ impl RabbitMQConnection{
         }
     }
 }
-
-
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-
-    #[test]
-    fn should_close_a_connection(){
-
-    }
-}
