@@ -1,1 +1,2 @@
-pub mod client;
+pub mod rabbitmq_utils;
+pub mod amqp;
