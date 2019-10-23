@@ -5,14 +5,15 @@ Author Andrew Evans
 */
 
 
+#[derive(Clone)]
 pub struct AMQPConnectionInf{
-    protocol: String,
-    host: String,
-    port: i64,
-    vhost: Option<String>,
-    username: Option<String>,
-    password: Option<String>,
-    is_ssl: bool,
+    pub protocol: String,
+    pub host: String,
+    pub port: i64,
+    pub vhost: Option<String>,
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub is_ssl: bool,
 }
 
 impl AMQPConnectionInf{
