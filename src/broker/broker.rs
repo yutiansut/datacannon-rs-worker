@@ -2,11 +2,9 @@
 Implementation of available brokers
 */
 
-use crate::queue::rabbitmq_utils::{QueueUtils};
-
 
 pub struct RabbitMQBroker{
-    qutils: QueueUtils,
+
 }
 
 

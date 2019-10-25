@@ -2,10 +2,12 @@
 /// Author: Andrew Evans
 use std::fmt;
 use std::sync::{Arc, Mutex};
-use crate::connection::rabbitmq_connection_utils;
-use crate::connection::rabbitmq_connection_utils::RabbitMQConnection;
+
 use amiquip::{Channel, Connection};
 
+use crate::connection::rabbitmq_connection_utils;
+use crate::connection::rabbitmq_connection_utils::RabbitMQConnection;
+use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
 
 ///Credentials object
 pub struct Credential{
@@ -29,6 +31,10 @@ impl RabbitMQConnectionFactory {
     /// Open a connection and channel. Return a connection object with blocking access
     fn create_connection_object(&self, url: String) -> Result<RabbitMQConnection, &'static str> {
         RabbitMQConnection::new(url)
+    }
+
+    fn create_threadable_connection_object(&self, url: String) -> Result<ThreadableRabbitMQConnection, &'static str> {
+        ThreadableRabbitMQConnection::new(url)
     }
 
     /// Append a host if it exists
@@ -56,6 +62,22 @@ impl RabbitMQConnectionFactory {
         }
     }
 
+
+    /// Create a thread safe connection from the factory
+    pub fn create_threadable_connection(&self, credentials: Option<Credential>, is_ssl: bool) -> Result<ThreadableRabbitMQConnection, &'static str> {
+        if(credentials.is_some()){
+            let cred: Credential = credentials.unwrap();
+            let mut url: String = format!("{}://{}:{}@{}:{}", self.protocol, cred.username, cred.password, self.host, self.port);
+            url = self.append_host(url).to_owned();
+            println!("{}", url);
+            self.create_threadable_connection_object(url)
+        }else{
+            let mut url: String = format!("{}://{}:{}", self.protocol, self.host, self.port);
+            url = self.append_host(url).to_owned();
+            self.create_threadable_connection_object(url)
+        }
+    }
+
     /// Create a new object
     pub fn new(protocol: String, host: String, port: &i64, vhost: Option<String>) -> RabbitMQConnectionFactory{
         RabbitMQConnectionFactory{
@@ -70,11 +92,13 @@ impl RabbitMQConnectionFactory {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::ops::DerefMut;
     use std::borrow::Borrow;
-    use crate::connection::rabbitmq_connection_utils;
+    use std::ops::DerefMut;
     use std::thread;
+
+    use crate::connection::rabbitmq_connection_utils;
+
+    use super::*;
 
     #[test]
     fn should_create_new(){
