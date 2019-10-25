@@ -4,9 +4,7 @@ Backend message struct
 Author Andrew Evans
 */
 
-
 pub struct BackendMessage{
-    message: vec<u8>,
 }
 
 pub struct ReturnMessage{
@@ -16,16 +14,8 @@ pub struct ReturnMessage{
 
 impl BackendMessage{
 
-    fn deserialize_message(&self) -> ReturnMessage{
-        ReturnMessage{
-            message: String::from("unimplemented"),
-        }
-    }
-
-    fn new(message: vec<u8>) -> BackendMessage{
-        BackendMessage{
-            message: message,
-        }
+    fn new() -> BackendMessage{
+        BackendMessage{}
     }
 }
 

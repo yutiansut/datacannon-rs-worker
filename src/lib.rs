@@ -5,3 +5,4 @@ pub mod queue;
 pub mod task;
 pub mod worker;
 pub mod config;
+pub mod message;

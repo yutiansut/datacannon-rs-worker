@@ -122,7 +122,7 @@ mod tests{
     use std::sync::{LockResult, Mutex, PoisonError};
     use std::thread;
 
-    use amiquip::{ExchangeDeclareOptions, ExchangeType, FieldTable, QueueDeclareOptions, QueueDeleteOptions, Result};
+    use amiquip::{ExchangeDeclareOptions, ExchangeType, FieldTable, QueueDeclareOptions, QueueDeleteOptions, Result, Publish};
 
     use super::*;
 
