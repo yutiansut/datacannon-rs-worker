@@ -6,3 +6,4 @@ pub mod task;
 pub mod worker;
 pub mod config;
 pub mod message;
+pub mod uuid;
