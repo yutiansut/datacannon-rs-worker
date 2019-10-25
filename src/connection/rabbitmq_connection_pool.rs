@@ -39,6 +39,7 @@ impl ThreadableRabbitMQConnectionPool{
     /// Release the connection
     fn release_connection(&mut self, conn: ThreadableRabbitMQConnection){
         self.active_connections.push(conn);
+        self.current_size += 1;
     }
 
     /// Get a connection from the pool
@@ -72,17 +73,17 @@ impl ThreadableRabbitMQConnectionPool{
         if rconn.is_ok(){
             let conn = rconn.ok().unwrap();
             self.active_connections.push(conn);
+            self.current_size += 1;
         }
     }
 
     /// Start the connection
     fn start(&mut self) {
         if self.active_connections.len() == 0{
-            for i in 0..self.active_connections.len(){
+            for i in 0..self.initial_size{
                 self.add_connection();
             }
         }
-        self.current_size = self.active_connections.len();
     }
 
     /// close the pool
@@ -121,7 +122,7 @@ mod tests{
     use std::sync::{LockResult, Mutex, PoisonError};
     use std::thread;
 
-    use amiquip::{ExchangeDeclareOptions, ExchangeType, FieldTable, QueueDeclareOptions, QueueDeleteOptions};
+    use amiquip::{ExchangeDeclareOptions, ExchangeType, FieldTable, QueueDeclareOptions, QueueDeleteOptions, Result};
 
     use super::*;
 
@@ -143,6 +144,8 @@ mod tests{
         let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 3);
         println!("Starting pool");
         pool.start();
+        assert!(pool.current_size == 3);
+        assert!(pool.active_connections.len() == 3);
         println!("Closing Pool");
         pool.close_pool();
     }
@@ -152,7 +155,11 @@ mod tests{
         let conn_inf = get_amqp_conn_inf();
         let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 3);
         pool.start();
+        assert!(pool.current_size == 3);
+        assert!(pool.active_connections.len() == 3);
         pool.add_connection();
+        assert!(pool.current_size == 4);
+        assert!(pool.active_connections.len() == 4);
         pool.close_pool();
     }
 
@@ -163,16 +170,40 @@ mod tests{
         pool.start();
         let conn = pool.get_connection().unwrap();
         conn.connection.close();
+        assert!(pool.current_size == 2);
+        assert!(pool.active_connections.len() == 2);
         pool.close_pool();
     }
 
     #[test]
     fn should_release_connection(){
-
+        let conn_inf = get_amqp_conn_inf();
+        let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 3);
+        pool.start();
+        let conn = pool.get_connection().unwrap();
+        assert!(pool.current_size == 2);
+        assert!(pool.active_connections.len() == 2);
+        pool.release_connection(conn);
+        assert!(pool.current_size == 3);
+        assert!(pool.active_connections.len() == 3);
+        pool.close_pool();
     }
 
     #[test]
-    fn should_perform_function_in_a_thread(){
-
+    fn should_perform_function_in_a_thread() -> Result<()>{
+        let conn_inf = get_amqp_conn_inf();
+        let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 3);
+        pool.start();
+        let mut conn = pool.get_connection().unwrap();
+        let channel = conn.connection.open_channel(None)?;
+        let _t = thread::spawn(move || ->Result<()> {
+            let queue = channel.queue_declare("hello",QueueDeclareOptions::default());
+            queue.unwrap().delete(QueueDeleteOptions::default());
+            Ok(())
+        });
+        _t.join();
+        pool.release_connection(conn);
+        pool.close_pool();
+        Ok(())
     }
 }
