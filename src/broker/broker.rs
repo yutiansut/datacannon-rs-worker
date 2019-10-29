@@ -25,61 +25,20 @@ pub struct RabbitMQBroker{
 
 /// AMQP Broker
 pub trait AMQPBroker{
-    fn get_headers(&self, lang: String, correlation_id: String, task_name: String, expires: String, time_limit: String, soft_time_limit: String, args: Vec<Any>, kwargs: Map<String, &Any>) -> Map<String, String>;
-    fn get_body(&self, args: Vec<Any>, kwargs: Map<String, &Any>) -> Vec<Any>;
-    fn get_body_task_config(&self) -> Map<String, String>;
-    fn get_basic_properties(&self, task_name: String, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, args: String, kwargs: String, eta: String, retries: i8) -> AmqpProperties;
-    fn create_queues(&self, declare_exchange: bool, uuid: String) -> String;
-    fn send_task_message(&self, connection: ThreadableRabbitMQConnection, message: BrokerMessage, routing_key: String, properties: AmqpProperties);
-    fn package_message(&self, task_name: String, args: Vec<Any>, kwargs: Map<String, &Any>, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, eta: String, retries: i8) -> TaskMessagev2;
-    fn send_task(&self, task_config: TaskConfig, args: Vec<Any>, kwargs: Map<String, &Any>);
+    //fn get_headers(&self, lang: String, correlation_id: String, task_name: String, expires: String, time_limit: String, soft_time_limit: String, args: Vec<Any>, kwargs: Map<String, &Any>) -> Map<String, String>;
+    //fn get_body(&self, args: Vec<Any>, kwargs: Map<String, &Any>) -> Vec<Any>;
+    //fn get_body_task_config(&self) -> Map<String, String>;
+    //fn get_basic_properties(&self, task_name: String, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, args: String, kwargs: String, eta: String, retries: i8) -> AmqpProperties;
+    //fn create_queues(&self, declare_exchange: bool, uuid: String) -> String;
+    //fn send_task_message(&self, connection: ThreadableRabbitMQConnection, message: BrokerMessage, routing_key: String, properties: AmqpProperties);
+    //fn package_message(&self, task_name: String, args: Vec<Any>, kwargs: Map<String, &Any>, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, eta: String, retries: i8) -> TaskMessagev2;
+    //fn send_task(&self, task_config: TaskConfig, args: Vec<Any>, kwargs: Map<String, &Any>);
 }
 
 
 /// AMQP Broker
 impl AMQPBroker for RabbitMQBroker{
 
-    /// Get the message headers
-    fn get_headers(&self, lang: String, correlation_id: String, task_name: String, expires: String, time_limit: String, soft_time_limit: String, args: Vec<Any>, kwargs: Map<String, &Any>) -> Map<String, String> {
-        let mut headers = BTreeMap::<String, AmqpValue>::new();
-        headers.insert(String::from("lang"), AmqpValue::LongString(lang));
-        unimplemented!()
-    }
-
-    /// Get the body
-    fn get_body(&self, args: Vec<Any>, kwargs: Map<String, &Any>) -> Vec<Any> {
-        unimplemented!()
-    }
-
-    /// Get the body task config
-    fn get_body_task_config(&self) -> Map<String, String> {
-        unimplemented!()
-    }
-
-    /// Get the basic properties
-    fn get_basic_properties(&self, task_name: String, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, args: String, kwargs: String, eta: String, retries: i8) -> AmqpProperties {
-        unimplemented!()
-    }
-
-    /// Create the queues
-    fn create_queues(&self, declare_exchange: bool, uuid: String) -> String {
-        unimplemented!()
-    }
-
-    /// Semd the task message
-    fn send_task_message(&self, connection: ThreadableRabbitMQConnection, message: BrokerMessage, routing_key: String, properties: AmqpProperties) {
-        unimplemented!()
-    }
-
-    /// Package the message
-    fn package_message(&self, task_name: String, args: Vec<Any>, kwargs: Map<String, &Any>, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, eta: String, retries: i8) -> TaskMessagev2 {
-        unimplemented!()
-    }
-
-    /// Send task
-    fn send_task(&self, task_config: TaskConfig, args: Vec<Any>, kwargs: Map<String, &Any>) {
-        unimplemented!()
-    }
 }
 
 

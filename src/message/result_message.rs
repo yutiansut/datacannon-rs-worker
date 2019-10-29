@@ -13,5 +13,5 @@ struct ResultMessagev2{
     task: String,
     exchange_name: String,
     routing_key: String,
-    body_objects: Vec<Any>,
+    body_objects: [u8],
 }
