@@ -17,12 +17,13 @@ use serde_json::Value;
 /// Keyword argument
 #[derive(Clone, Debug)]
 pub struct KwArg{
-    key: String,
-    arg: Arg,
+    pub key: String,
+    pub arg: Arg,
 }
 
 
 /// Structure storing the arguments
+#[derive(Clone, Debug)]
 pub struct KwArgs{
     pub kwargs: Vec<KwArg>,
 }

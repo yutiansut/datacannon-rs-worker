@@ -11,6 +11,7 @@ use serde_json::Value;
 
 
 /// Structure storing the arguments
+#[derive(Clone, Debug)]
 pub struct Args{
     pub args: Vec<Arg>,
 }
