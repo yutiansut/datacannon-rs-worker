@@ -5,7 +5,9 @@ Author Andrew Evans
 */
 
 use amiquip::AmqpValue;
+use amq_protocol::types::AMQPType;
 use std::vec::Vec;
+use serde_json::Value;
 
 
 /// Structure storing the arguments
@@ -17,8 +19,8 @@ pub struct Args{
 /// Struct storing a single argument
 #[derive(Clone, Debug)]
 pub struct Arg{
-    pub arg: String,
-    pub arg_type: AmqpValue,
+    pub arg: Value,
+    pub arg_type: AMQPType,
 }
 
 
@@ -26,7 +28,7 @@ pub struct Arg{
 impl Arg{
 
     /// Create a new argument
-    fn new(arg: String, arg_type: AmqpValue) -> Arg{
+    fn new(arg: Value, arg_type: AMQPType) -> Arg{
         Arg{
             arg: arg,
             arg_type: arg_type
@@ -63,29 +65,28 @@ mod tests{
 
     use super::*;
 
+    use serde_json::Value;
+    use amq_protocol::types::AMQPType;
+
 
     #[test]
     fn should_create_an_argument(){
         let test_string = String::from("test");
-        let arg = Arg::new(test_string.clone(), AmqpValue::LongString(test_string.clone()));
-        assert!(arg.arg.eq("test_string"));
+        let test_val = Value::from(test_string);
+        let arg = Arg::new(test_val.clone(), AMQPType::LongString);
+        assert!(arg.arg.as_str().unwrap().eq("test"));
     }
 
     #[test]
     fn should_create_an_argument_list(){
         let test_string = String::from("test");
-        let arg = Arg::new(test_string.clone(), AmqpValue::LongString(test_string.clone()));
-        assert!(arg.arg.eq("test"));
-        let test_int_arg = format!("{}", 0);
-        let arg_b = Arg::new(test_int_arg, AmqpValue::ShortInt(0));
-        assert!(arg_b.arg.eq("0"));
-        let i = arg_b.arg.parse::<i8>().unwrap();
-        assert!(i == 0);
+        let test_val = Value::from(test_string);
+        let arg = Arg::new(test_val.clone(), AMQPType::LongString);
+        assert!(arg.arg.as_str().unwrap().eq("test"));
         let mut args = Args::new();
-        args.add_arg(arg);
-        args.add_arg(arg_b);
-        assert!(args.size() == 2);
-        assert!(args.args.len() == 2);
-        assert!(args.args[0].arg.eq("test"));
+        args.args.push(arg);
+        assert!(args.size() == 1);
+        assert!(args.args.len() == 1);
+        assert!(args.args.get(0).unwrap().arg.as_str().unwrap().eq("test"));
     }
 }

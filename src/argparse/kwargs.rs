@@ -5,11 +5,13 @@ Author Andrew Evans
 */
 
 use amiquip::AmqpValue;
+use amq_protocol::types::AMQPType;
 use std::vec::Vec;
 
 use crate::argparse::args::Arg;
 use std::iter::Map;
 use std::collections::HashMap;
+use serde_json::Value;
 
 
 /// Keyword argument
@@ -30,7 +32,7 @@ pub struct KwArgs{
 impl KwArg{
 
     /// Create a new argument
-    fn new(key: String, arg: String, arg_type: AmqpValue) -> KwArg{
+    fn new(key: String, arg: Value, arg_type: AMQPType) -> KwArg{
         let arg_object = Arg{
             arg: arg,
             arg_type: arg_type,
@@ -71,16 +73,18 @@ impl KwArgs{
 mod tests{
 
     use super::*;
-    use std::sync::atomic::Ordering::AcqRel;
+    use amq_protocol::types::AMQPType;
+    use serde_json::Value;
 
 
     #[test]
     fn should_create_an_kwarg_argument(){
         let kstr = String::from("test_key");
-        let kval = String::from("test_val");
+        let kvalstr = String::from("test_val");
+        let kval = Value::from(kvalstr);
         let arg = Arg{
             arg: kval.clone().to_owned(),
-            arg_type: AmqpValue::LongString(kval.clone()),
+            arg_type: AMQPType::LongString,
         };
 
         let kwarg = KwArg{
@@ -90,16 +94,17 @@ mod tests{
         let k = kwarg.key;
         let v = kwarg.arg.arg;
         assert!(k.eq("test_key"));
-        assert!(v.eq("test_val"));
+        assert!(v.as_str().unwrap().eq("test_val"));
     }
 
     #[test]
     fn should_create_a_kwargs_list(){
         let kstr = String::from("test_key");
-        let kval = String::from("test_val");
+        let kvalstr = String::from("test_val");
+        let kval = Value::from(kvalstr);
         let arg = Arg{
             arg: kval.clone().to_owned(),
-            arg_type: AmqpValue::LongString(kval.clone()),
+            arg_type: AMQPType::LongString,
         };
 
         let kwarg = KwArg{
@@ -107,10 +112,11 @@ mod tests{
             arg: arg.to_owned(),
         };
         let kstrb = String::from("test_keyb");
-        let vstrb = String::from("test_valb");
+        let kvstrb = String::from("test_val");
+        let vstrb = Value::from(kvstrb);
         let argb = Arg{
             arg: vstrb.clone().to_owned(),
-            arg_type: AmqpValue::LongString(vstrb.clone()),
+            arg_type: AMQPType::LongString,
         };
         let kwargb = KwArg{
             key: kstrb.to_owned(),
