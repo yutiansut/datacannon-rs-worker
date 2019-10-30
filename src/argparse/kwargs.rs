@@ -9,9 +9,8 @@ use amq_protocol::types::AMQPType;
 use std::vec::Vec;
 
 use crate::argparse::args::Arg;
-use std::iter::Map;
-use std::collections::HashMap;
-use serde_json::Value;
+use std::collections::{HashMap, BTreeMap};
+use serde_json::{Value, Map};
 
 
 /// Keyword argument
@@ -50,18 +49,42 @@ impl KwArg{
 /// Implementation of arguments list
 impl KwArgs{
 
+    /// Convert to a btree map
+    pub fn convert_to_btree_map(&self) -> BTreeMap<String, Value>{
+        let vkwarr = self.kwargs.clone();
+        let mut vm = BTreeMap::<String, Value>::new();
+        for i in 0..vkwarr.len(){
+            let kwarg = vkwarr.get(i).unwrap().clone();
+            vm.insert(kwarg.key, kwarg.arg.arg);
+        }
+        vm
+    }
+
+    /// Covnert kwargs to map
+    pub fn convert_to_map(&self) -> Map<String, Value>{
+        let vkwarr = self.kwargs;
+        let mut vm = Map::new();
+        for i in 0..vkwarr.len(){
+            let kwarg = vkwarr.get(i).unwrap().clone();
+            let val = kwarg.arg.arg;
+            let key = kwarg.key;
+            vm.insert(key, val);
+        }
+        vm
+    }
+
     /// size of the list
-    fn size(&self) -> usize{
+    pub fn size(&self) -> usize{
         self.kwargs.len()
     }
 
     /// add an argument
-    fn add_kwarg(&mut self, kwarg: KwArg){
+    pub fn add_kwarg(&mut self, kwarg: KwArg){
         self.kwargs.push(kwarg);
     }
 
     /// create a new arguments list
-    fn new() -> KwArgs{
+    pub fn new() -> KwArgs{
         KwArgs{
             kwargs: Vec::<KwArg>::new(),
         }

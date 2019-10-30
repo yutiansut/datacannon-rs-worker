@@ -29,7 +29,7 @@ pub struct Arg{
 impl Arg{
 
     /// Create a new argument
-    fn new(arg: Value, arg_type: AMQPType) -> Arg{
+    pub fn new(arg: Value, arg_type: AMQPType) -> Arg{
         Arg{
             arg: arg,
             arg_type: arg_type
@@ -41,18 +41,45 @@ impl Arg{
 /// Implementation of arguments list
 impl Args{
 
+    pub fn value_to_amqp_value(val: &Value) -> AmqpValue{
+        if val.is_array(){
+
+        }
+    }
+
+    /// convert to amqp vec
+    pub fn args_to_amqp_vec(&self) -> Vec<AmqpValue>{
+        let mut val_vec = Vec::<AmqpValue>::new();
+        for i in 0..self.args.len(){
+            let val = self.args.get(i).unwrap().clone();
+
+            //val_vec.push(Value::from(val));
+        }
+        val_vec
+    }
+
+    /// convert args to a vec
+    pub fn args_to_vec(&self) -> Vec<Value>{
+        let mut val_vec = Vec::<Value>::new();
+        for i in 0..self.args.len(){
+            let val = self.args.get(i).unwrap().clone();
+            val_vec.push(Value::from(val));
+        }
+        val_vec
+    }
+
     /// size of the list
-    fn size(&self) -> usize{
+    pub fn size(&self) -> usize{
         self.args.len()
     }
 
     /// add an argument
-    fn add_arg(&mut self, arg: Arg){
+    pub fn add_arg(&mut self, arg: Arg){
         self.args.push(arg);
     }
 
     /// create a new arguments list
-    fn new() -> Args{
+    pub fn new() -> Args{
         Args{
            args: Vec::<Arg>::new(),
         }

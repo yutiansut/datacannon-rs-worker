@@ -20,7 +20,7 @@ pub struct Properties{
 impl Properties{
 
     /// convert to amqp properties
-    fn convert_to_amqp_properties(&self) -> AmqpProperties{
+    pub fn convert_to_amqp_properties(&self) -> AmqpProperties{
         let uid =  Uuid::new_v4();
         let message_id = format!("{}", uid);
         let mut props = AmqpProperties::default();
@@ -36,7 +36,7 @@ impl Properties{
     }
 
     /// Create a new properties
-    fn new(correlation_id: String, content_type: String, content_encoding: String, reply_to: Option<String>) -> Properties{
+    pub fn new(correlation_id: String, content_type: String, content_encoding: String, reply_to: Option<String>) -> Properties{
         Properties{
             correlation_id: correlation_id,
             content_type: content_type,

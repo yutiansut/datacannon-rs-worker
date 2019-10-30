@@ -4,8 +4,10 @@ Headers for the message
 Author Andrew Evans
 */
 
+use amiquip::AmqpValue;
 use crate::argparse::{args::Args, kwargs::KwArgs};
 use serde_json::{Value, Map, Number};
+use std::collections::BTreeMap;
 
 
 /// Soft and hard time limits
@@ -40,8 +42,69 @@ pub struct Headers{
 /// Headers implementation
 impl Headers{
 
+    /// convert headers to a btree map
+    pub fn convert_to_btree_map(&self) -> BTreeMap<String, AmqpValue>{
+        let mut jmap = BTreeMap::<String, AmqpValue>::new();
+        jmap.insert(String::from("lang"), AmqpValue::LongString(self.lang.clone()));
+        jmap.insert(String::from("task"), AmqpValue::LongString(self.task.clone()));
+        jmap.insert(String::from("id"), AmqpValue::LongString(self.id.clone()));
+        jmap.insert(String::from("root_id"), AmqpValue::LongString(self.root_id.clone()));
+        jmap.insert(String::from("parent_id"), AmqpValue::LongString(self.parent_id.clone()));
+        jmap.insert(String::from("group"), AmqpValue::LongString(self.group.clone()));
+
+        if self.meth.is_some() {
+            let v = self.meth.clone().unwrap();
+            jmap.insert(String::from("meth"), AmqpValue::LongString(v));
+        }
+
+        if self.shadow.is_some(){
+            let v = self.shadow.clone().unwrap();
+            jmap.insert(String::from("shadow"), AmqpValue::LongString(v));
+        }
+
+        if self.eta.is_some(){
+            let v = self.eta.clone().unwrap();
+            jmap.insert(String::from("eta"), AmqpValue::LongString(v));
+        }
+
+        if self.expires.is_some(){
+            let v = self.expires.clone().unwrap();
+            jmap.insert(String::from("expires"), AmqpValue::LongString(v));
+        }
+
+        if self.retries.is_some(){
+            let v = self.retries.clone().unwrap();
+            jmap.insert(String::from("retries"), AmqpValue::ShortShortInt(v));
+        }
+
+        if self.timelimit.is_some(){
+            let v = self.timelimit.clone().unwrap();
+            let vtup = vec![AmqpValue::LongLongInt(v.soft), AmqpValue::LongLongInt(v.hard)];
+            jmap.insert(String::from("timelimit"), AmqpValue::FieldArray(vtup));
+        }
+
+        if self.argsrepr.is_some(){
+            let v = self.argsrepr.clone().unwrap();
+            let argsrepr = v.args_to_vec();
+            jmap.insert(String::from("args"), AmqpValue::From(Value::from(v.args_to_vec())));
+        }
+
+        if self.kwargsrepr.is_some(){
+            let v = self.kwargsrepr.clone().unwrap();
+            let vm = v.convert_to_map();
+            jmap.insert(String::from("kwargsrepr"), AmqpValue::From(Value::Object(vm)));
+        }
+
+
+        if self.origin.is_some(){
+            let v = self.origin.clone().unwrap();
+            jmap.insert(String::from("origin"), AmqpValue::From(Value::from(v)));
+        }
+        jmap
+    }
+
     /// convert to a json capable map
-    fn convert_to_json_map(&self) -> Map<String, Value>{
+    pub fn convert_to_json_map(&self) -> Map<String, Value>{
         let mut jmap = Map::new();
         jmap.insert(String::from("lang"), Value::String(self.lang.clone()));
         jmap.insert(String::from("task"), Value::String(self.task.clone()));
@@ -83,25 +146,13 @@ impl Headers{
 
         if self.argsrepr.is_some(){
             let v = self.argsrepr.clone().unwrap();
-            let varr = v.args;
-            let mut argsrep = Vec::<Value>::new();
-            for i in 0..varr.len(){
-                let val = varr.get(i).unwrap();
-                argsrep.push(val.arg.clone());
-            }
-            jmap.insert(String::from("args"), Value::Array(argsrep));
+            let argsrepr = v.args_to_vec();
+            jmap.insert(String::from("args"), Value::Array(argsrepr));
         }
 
         if self.kwargsrepr.is_some(){
             let v = self.kwargsrepr.clone().unwrap();
-            let vkwarr = v.kwargs;
-            let mut vm = Map::new();
-            for i in 0..vkwarr.len(){
-                let kwarg = vkwarr.get(i).unwrap().clone();
-                let val = kwarg.arg.arg;
-                let key = kwarg.key;
-                vm.insert(key, val);
-            }
+            let vm = v.convert_to_map();
             jmap.insert(String::from("kwargsrepr"), Value::Object(vm));
         }
 
@@ -114,7 +165,7 @@ impl Headers{
     }
 
     /// create new headers
-    fn new(lang: String, task: String, id: String, root_id: String, parent_id: String, group: String) -> Headers{
+    pub fn new(lang: String, task: String, id: String, root_id: String, parent_id: String, group: String) -> Headers{
         Headers{
             lang: lang,
             task: task,
