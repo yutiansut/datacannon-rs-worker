@@ -8,6 +8,7 @@ use amiquip::AmqpValue;
 use crate::argparse::{args::Args, kwargs::KwArgs};
 use serde_json::{Value, Map, Number};
 use std::collections::BTreeMap;
+use amq_protocol::uri::AMQPScheme::AMQP;
 
 
 /// Soft and hard time limits
@@ -86,19 +87,19 @@ impl Headers{
         if self.argsrepr.is_some(){
             let v = self.argsrepr.clone().unwrap();
             let argsrepr = v.args_to_vec();
-            jmap.insert(String::from("args"), AmqpValue::From(Value::from(v.args_to_vec())));
+            jmap.insert(String::from("args"), AmqpValue::FieldArray(v.args_to_amqp_vec()));
         }
 
         if self.kwargsrepr.is_some(){
             let v = self.kwargsrepr.clone().unwrap();
-            let vm = v.convert_to_map();
-            jmap.insert(String::from("kwargsrepr"), AmqpValue::From(Value::Object(vm)));
+            let vm = v.convert_to_btree_map();
+            jmap.insert(String::from("kwargsrepr"), AmqpValue::FieldTable(vm));
         }
 
 
         if self.origin.is_some(){
             let v = self.origin.clone().unwrap();
-            jmap.insert(String::from("origin"), AmqpValue::From(Value::from(v)));
+            jmap.insert(String::from("origin"), AmqpValue::LongString(v));
         }
         jmap
     }

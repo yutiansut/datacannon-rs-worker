@@ -5,5 +5,6 @@ pub mod queue;
 pub mod task;
 pub mod worker;
 pub mod config;
+pub mod serde_utils;
 pub mod argparse;
 pub mod json;

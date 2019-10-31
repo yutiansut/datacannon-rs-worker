@@ -50,19 +50,19 @@ impl KwArg{
 impl KwArgs{
 
     /// Convert to a btree map
-    pub fn convert_to_btree_map(&self) -> BTreeMap<String, Value>{
+    pub fn convert_to_btree_map(&self) -> BTreeMap<String, AmqpValue>{
         let vkwarr = self.kwargs.clone();
-        let mut vm = BTreeMap::<String, Value>::new();
+        let mut vm = BTreeMap::<String, AmqpValue>::new();
         for i in 0..vkwarr.len(){
             let kwarg = vkwarr.get(i).unwrap().clone();
-            vm.insert(kwarg.key, kwarg.arg.arg);
+            vm.insert(kwarg.key, AmqpValue::from(kwarg.arg.arg));
         }
         vm
     }
 
     /// Covnert kwargs to map
     pub fn convert_to_map(&self) -> Map<String, Value>{
-        let vkwarr = self.kwargs;
+        let vkwarr = self.kwargs.clone();
         let mut vm = Map::new();
         for i in 0..vkwarr.len(){
             let kwarg = vkwarr.get(i).unwrap().clone();
