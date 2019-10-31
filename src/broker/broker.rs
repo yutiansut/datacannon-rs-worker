@@ -5,48 +5,63 @@ Author Andrew Evans
 */
 
 use std::any::Any;
+use std::collections::BTreeMap;
+use std::env::Args;
 use std::iter::Map;
 
 use amiquip::{AmqpProperties, AmqpValue};
 use serde_json::Value;
 
+use crate::argparse::kwargs::KwArgs;
+use crate::broker::headers::Headers;
+use crate::broker::message_body::MessageBody;
 use crate::config::config::CeleryConfig;
 use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
 use crate::task::config::TaskConfig;
-use std::collections::BTreeMap;
-use std::env::Args;
-use crate::argparse::kwargs::KwArgs;
-
+use crate::broker::properties::Properties;
+use crate::queue::amqp::AMQPConnectionInf;
 
 /// RabbitMQ Broker
 pub struct RabbitMQBroker{
-    config: CeleryConfig
+    config: CeleryConfig,
+    connection_pool: ThreadableRabbitMQConnection,
 }
 
 
 /// AMQP Broker
 pub trait AMQPBroker{
-    fn get_headers(&self, lang: String, correlation_id: String, task_name: String, expires: String, time_limit: String, soft_time_limit: String, args: Args, kwargs: KwArgs) -> Map<String, String>;
-    fn get_body(&self, args: Args, kwargs: KwArgs) -> Vec<Value>;
-    //fn get_body_task_config(&self) -> Map<String, String>;
-    //fn get_basic_properties(&self, task_name: String, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, args: String, kwargs: String, eta: String, retries: i8) -> AmqpProperties;
-    //fn create_queues(&self, declare_exchange: bool, uuid: String) -> String;
-    //fn send_task_message(&self, connection: ThreadableRabbitMQConnection, message: BrokerMessage, routing_key: String, properties: AmqpProperties);
-    //fn package_message(&self, task_name: String, args: Vec<Any>, kwargs: Map<String, &Any>, reply_to: String, correlation_id: String, expires: String, priority: i8, time_limit: i64, soft_time_limit: i64, eta: String, retries: i8) -> TaskMessagev2;
-    //fn send_task(&self, task_config: TaskConfig, args: Vec<Any>, kwargs: Map<String, &Any>);
+    fn send_task(&self, task: String, props: Properties, headers: Headers, body: MessageBody) -> Result<String, ()>;
+    fn bind_to_exchange(&self, exchange: String, queue: String) -> Result<String, ()>;
+    fn create_queue(&self, declare_exchange: bool, uuid: String) -> Result<String, ()>;
 }
 
 
 /// AMQP Broker
 impl AMQPBroker for RabbitMQBroker{
-
-    /// obtain the headers for messaging
-    fn get_headers(&self, lang: String, correlation_id: String, task_name: String, expires: String, time_limit: String, soft_time_limit: String, args: Args, kwargs: KwArgs) -> Map<String, String> {
+    fn send_task(&self, task: String, props: Properties, headers: Headers, body: MessageBody) -> Result<String, ()> {
         unimplemented!()
     }
 
-    /// Get the body
-    fn get_body(&self, args: Args, kwargs: KwArgs) -> Vec<Value> {
+    fn bind_to_exchange(&self, exchange: String, queue: String) -> Result<String, ()> {
+        unimplemented!()
+    }
+
+    fn create_queue(&self, declare_exchange: bool, uuid: String) -> Result<String, ()> {
+        unimplemented!()
+    }
+}
+
+
+/// Rabbit MQ broker
+impl RabbitMQBroker{
+
+    fn setup_connection_pool(config: CeleryConfig) -> ThreadableRabbitMQConnection{
+
+        unimplemented!()
+    }
+
+    /// Create a new broker
+    pub fn new(config: CeleryConfig) -> RabbitMQBroker{
         unimplemented!()
     }
 }

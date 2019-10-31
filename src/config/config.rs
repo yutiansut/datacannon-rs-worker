@@ -3,6 +3,7 @@
 
 use num_cpus;
 use std::collections::HashMap;
+use crate::queue::amqp::AMQPConnectionInf;
 
 
 pub enum QueuePersistenceType{
@@ -36,64 +37,65 @@ pub struct Admin{
 
 
 pub struct CeleryConfig{
-    broker_connection_retry: bool,
-    result_backend: String,
-    celery_cache_backend: Option<String>,
-    send_events: bool,
-    queues: Vec<String>,
-    default_exchange_type: ExchangeType,
-    default_queue: String,
-    broadcast_exchange: String,
-    broadcast_exchange_type: ExchangeType,
-    event_queue: String,
-    event_exchange: String,
-    event_exchange_type: ExchangeType,
-    event_routing_key: String,
-    event_serializer: String,
-    result_exchange: String,
-    accept_content: String,
-    worker_prefetch_multiplier: i8,
-    default_delivery_mode: QueuePersistenceType,
-    default_routing_key: String,
-    broker_connection_timeout: i64,
-    broker_connection_max_retries: i64,
-    broadcast_queue: String,
-    backend_type: BackendType,
-    broker: String,
-    broker_type: BrokerType,
-    celery_send_task_error_emails: bool,
-    admins: Vec<Admin>,
-    server_email: String,
-    mail_host: String,
-    mail_host_user: Option<String>,
-    mail_host_password: Option<String>,
-    mail_port: i8,
-    always_eager: bool,
-    eager_propogates_exceptions: bool,
-    track_started: bool,
-    acks_late: bool,
-    store_errors_even_if_ignored: bool,
-    task_result_expires: i64,
-    ignore_result: bool,
-    max_cached_results: i32,
-    result_persistent: QueuePersistenceType,
-    result_serializer: String,
-    database_engine_options: Option<HashMap<String, String>>,
-    default_rate_limit: i8,
-    disable_rate_limits: bool,
-    celerybeat_log_level: String,
-    celerybeat_log_file: Option<String>,
-    celerybeat_schedule_file_name: String,
-    celerybeat_max_loop_interval: i64,
-    celerymon_log_level: String,
-    celerymon_log_file: Option<String>,
-    num_threads: usize,
+    pub connection_inf: AMQPConnectionInf,
+    pub broker_connection_retry: bool,
+    pub result_backend: String,
+    pub celery_cache_backend: Option<String>,
+    pub send_events: bool,
+    pub queues: Vec<String>,
+    pub default_exchange_type: ExchangeType,
+    pub default_queue: String,
+    pub broadcast_exchange: String,
+    pub broadcast_exchange_type: ExchangeType,
+    pub event_queue: String,
+    pub event_exchange: String,
+    pub event_exchange_type: ExchangeType,
+    pub event_routing_key: String,
+    pub event_serializer: String,
+    pub result_exchange: String,
+    pub accept_content: String,
+    pub worker_prefetch_multiplier: i8,
+    pub default_delivery_mode: QueuePersistenceType,
+    pub default_routing_key: String,
+    pub broker_connection_timeout: i64,
+    pub broker_connection_max_retries: i64,
+    pub broadcast_queue: String,
+    pub backend_type: BackendType,
+    pub broker_type: BrokerType,
+    pub celery_send_task_error_emails: bool,
+    pub admins: Vec<Admin>,
+    pub server_email: String,
+    pub mail_host: String,
+    pub mail_host_user: Option<String>,
+    pub mail_host_password: Option<String>,
+    pub mail_port: i8,
+    pub always_eager: bool,
+    pub eager_propogates_exceptions: bool,
+    pub track_started: bool,
+    pub acks_late: bool,
+    pub store_errors_even_if_ignored: bool,
+    pub task_result_expires: i64,
+    pub ignore_result: bool,
+    pub max_cached_results: i32,
+    pub result_persistent: QueuePersistenceType,
+    pub result_serializer: String,
+    pub database_engine_options: Option<HashMap<String, String>>,
+    pub default_rate_limit: i8,
+    pub disable_rate_limits: bool,
+    pub celerybeat_log_level: String,
+    pub celerybeat_log_file: Option<String>,
+    pub celerybeat_schedule_file_name: String,
+    pub celerybeat_max_loop_interval: i64,
+    pub celerymon_log_level: String,
+    pub celerymon_log_file: Option<String>,
+    pub num_connections: usize,
 }
 
 impl CeleryConfig{
 
-    pub fn new(broker: String, backend: String) -> CeleryConfig{
+    pub fn new(broker_inf: AMQPConnectionInf, backend: String) -> CeleryConfig{
         CeleryConfig{
+            connection_inf: broker_inf,
             broker_connection_retry: true,
             result_backend: backend,
             celery_cache_backend: None,
@@ -117,7 +119,6 @@ impl CeleryConfig{
             broker_connection_max_retries: 1000,
             broadcast_queue: String::from("celeryctl"),
             backend_type: BackendType::RPC,
-            broker: broker,
             broker_type: BrokerType::RABBITMQ,
             celery_send_task_error_emails: false,
             admins: Vec::<Admin>::new(),
@@ -145,7 +146,7 @@ impl CeleryConfig{
             celerybeat_max_loop_interval: 300000,
             celerymon_log_level: String::from("INFO"),
             celerymon_log_file: None,
-            num_threads: num_cpus::get(),
+            num_connections: num_cpus::get(),
         }
     }
 }
@@ -157,8 +158,17 @@ mod tests {
 
     #[test]
     fn should_create_a_configuration(){
-        let c = CeleryConfig::new(String::from("test"), String::from("test"));
-        assert!(c.broker.eq("test"));
-        assert!(c.result_backend.eq("test"));
+        let broker_conf = AMQPConnectionInf::new(
+            String::from("amqp"),
+            String::from("127.0.0.1"),
+            5672,
+            Some(String::from("test")),
+            Some(String::from("dev")),
+            Some(String::from("rtp*4500")),
+            false
+        );
+        let c = CeleryConfig::new(broker_conf, "testurl".to_string());
+        let url = c.connection_inf.to_url();
+        assert!(url.eq("amqp://dev:rtp*4500@127.0.0.1:5672/test"))
     }
 }

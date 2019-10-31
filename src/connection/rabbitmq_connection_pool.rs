@@ -20,9 +20,7 @@ use crate::queue::amqp::AMQPConnectionInf;
 pub struct ThreadableRabbitMQConnectionPool{
     pub initial_size: usize,
     pub current_size: usize,
-    is_ssl: bool,
-    username: Option<String>,
-    password: Option<String>,
+    conn_inf: AMQPConnectionInf,
     conn_factory: RabbitMQConnectionFactory,
     active_connections: Vec<ThreadableRabbitMQConnection>,
 }
@@ -55,16 +53,7 @@ impl ThreadableRabbitMQConnectionPool{
 
     /// Create a connection for the pool
     fn create_connection(&mut self) -> Result<ThreadableRabbitMQConnection, &'static str>{
-        let mut cred = None;
-        if self.username.is_some() && self.password.is_some(){
-            let str_user = self.username.as_mut().unwrap().to_owned();
-            let str_pass = self.password.as_mut().unwrap().to_owned();
-            cred = Some(Credential{
-                username: str_user,
-                password: str_pass,
-            });
-        }
-        self.conn_factory.create_threadable_connection(cred, self.is_ssl)
+        self.conn_factory.create_threadable_connection()
     }
 
     /// Add a connection
@@ -96,19 +85,12 @@ impl ThreadableRabbitMQConnectionPool{
 
     /// Create a new connection pool
     fn new(conn_inf: AMQPConnectionInf, min_connections: usize) -> ThreadableRabbitMQConnectionPool{
-        let protocol = conn_inf.protocol;
-        let host = conn_inf.host;
-        let port = conn_inf.port;
-        let vhost = conn_inf.vhost;
-        let is_ssl = conn_inf.is_ssl;
-        let factory = RabbitMQConnectionFactory::new(protocol, host, &port, vhost);
+        let factory = RabbitMQConnectionFactory::new(conn_inf.clone());
         let active_connections: Vec<ThreadableRabbitMQConnection> = Vec::<ThreadableRabbitMQConnection>::new();
         ThreadableRabbitMQConnectionPool{
             initial_size: min_connections,
             current_size: 0,
-            username: conn_inf.username,
-            password: conn_inf.password,
-            is_ssl: is_ssl,
+            conn_inf: conn_inf.clone(),
             conn_factory: factory,
             active_connections: active_connections,
         }
@@ -127,15 +109,15 @@ mod tests{
     use super::*;
 
     fn get_amqp_conn_inf() -> AMQPConnectionInf {
-        AMQPConnectionInf{
-            protocol: String::from("amqp"),
-            host: String::from("127.0.0.1"),
-            port: 5672,
-            vhost: Some(String::from("test")),
-            username: Some(String::from("dev")),
-            password: Some(String::from("rtp*4500")),
-            is_ssl: false
-        }
+        AMQPConnectionInf::new(
+            String::from("amqp"),
+            String::from("127.0.0.1"),
+            5672,
+            Some(String::from("test")),
+            Some(String::from("dev")),
+            Some(String::from("rtp*4500")),
+            false
+        )
     }
 
     #[test]

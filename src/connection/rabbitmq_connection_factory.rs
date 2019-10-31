@@ -8,6 +8,7 @@ use amiquip::{Channel, Connection};
 use crate::connection::rabbitmq_connection_utils;
 use crate::connection::rabbitmq_connection_utils::RabbitMQConnection;
 use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
+use crate::queue::amqp::AMQPConnectionInf;
 
 ///Credentials object
 pub struct Credential{
@@ -18,10 +19,7 @@ pub struct Credential{
 
 ///Overarching Rabbit MQ Connection Factory
 pub struct RabbitMQConnectionFactory{
-    protocol: String,
-    host: String,
-    port: i64,
-    vhost: Option<String>,
+    conn_inf: AMQPConnectionInf,
 }
 
 
@@ -33,58 +31,33 @@ impl RabbitMQConnectionFactory {
         RabbitMQConnection::new(url)
     }
 
+    /// create a threadable connection object
     fn create_threadable_connection_object(&self, url: String) -> Result<ThreadableRabbitMQConnection, &'static str> {
         ThreadableRabbitMQConnection::new(url)
-    }
-
-    /// Append a host if it exists
-    fn append_host(&self, in_url: String) -> String{
-        let mut url = in_url.clone();
-        if(self.vhost.is_some()){
-            let host: String = self.vhost.to_owned().unwrap();
-            url = format!("{}/{}", url, host);
-        }
-        url
     }
 
     /// Create a RabbitMQ Connection
     pub fn create_connection(&self, credentials: Option<Credential>, is_ssl: bool) -> Result<RabbitMQConnection, &'static str> {
         if(credentials.is_some()){
-            let cred: Credential = credentials.unwrap();
-            let mut url: String = format!("{}://{}:{}@{}:{}", self.protocol, cred.username, cred.password, self.host, self.port);
-            url = self.append_host(url).to_owned();
-            println!("{}", url);
+            let url = self.conn_inf.to_url();
             self.create_connection_object(url)
         }else{
-            let mut url: String = format!("{}://{}:{}", self.protocol, self.host, self.port);
-            url = self.append_host(url).to_owned();
+            let url = self.conn_inf.to_url();
             self.create_connection_object(url)
         }
     }
 
 
     /// Create a thread safe connection from the factory
-    pub fn create_threadable_connection(&self, credentials: Option<Credential>, is_ssl: bool) -> Result<ThreadableRabbitMQConnection, &'static str> {
-        if(credentials.is_some()){
-            let cred: Credential = credentials.unwrap();
-            let mut url: String = format!("{}://{}:{}@{}:{}", self.protocol, cred.username, cred.password, self.host, self.port);
-            url = self.append_host(url).to_owned();
-            println!("{}", url);
-            self.create_threadable_connection_object(url)
-        }else{
-            let mut url: String = format!("{}://{}:{}", self.protocol, self.host, self.port);
-            url = self.append_host(url).to_owned();
-            self.create_threadable_connection_object(url)
-        }
+    pub fn create_threadable_connection(&self) -> Result<ThreadableRabbitMQConnection, &'static str> {
+        let url= self.conn_inf.to_url();
+        self.create_threadable_connection_object(url)
     }
 
     /// Create a new object
-    pub fn new(protocol: String, host: String, port: &i64, vhost: Option<String>) -> RabbitMQConnectionFactory{
+    pub fn new(conn_inf: AMQPConnectionInf) -> RabbitMQConnectionFactory{
         RabbitMQConnectionFactory{
-            protocol: protocol,
-            host: host,
-            port: port.to_owned(),
-            vhost: vhost
+            conn_inf: conn_inf,
         }
     }
 }
@@ -102,7 +75,8 @@ mod tests {
 
     #[test]
     fn should_create_new(){
-        let f = RabbitMQConnectionFactory::new(String::from("amqp"), String::from("127.0.0.1"), &5672, Some(String::from("test")));
+        let aci = AMQPConnectionInf::new("amqp".to_string(), "127.0.0.1".to_string(), 3030, None, None, None, false);
+        let f = RabbitMQConnectionFactory::new(aci);
         let cred = Credential{
             username: String::from("dev"),
             password: String::from("rtp*4500"),
