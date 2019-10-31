@@ -9,6 +9,7 @@ use amq_protocol::types::AMQPType;
 use std::vec::Vec;
 use serde_json::Value;
 use amq_protocol::uri::AMQPScheme::AMQP;
+use crate::serde_utils::val_handler::value_to_amqp_value;
 
 
 /// Structure storing the arguments
@@ -47,7 +48,7 @@ impl Args{
         let mut val_vec = Vec::<AmqpValue>::new();
         for i in 0..self.args.len(){
             let val = self.args.get(i).unwrap().clone();
-            //val_vec.push(Value::from(val));
+            val_vec.push(value_to_amqp_value(&val.arg));
         }
         val_vec
     }
