@@ -51,7 +51,7 @@ pub trait AMQPBroker{
 impl AMQPBroker for RabbitMQBroker{
 
     /// create the exchange
-    fn create_exchange<'a>(channel: Channel, durable: bool, exchange: String, exchange_type: ExchangeType) {
+    fn create_exchange(channel: Channel, durable: bool, exchange: String, exchange_type: ExchangeType) {
         let mut opts = ExchangeDeclareOptions::default();
         opts.durable = durable;
         let r = channel.exchange_declare(exchange_type, exchange, opts);
