@@ -4,24 +4,30 @@
 use num_cpus;
 use std::collections::HashMap;
 use crate::queue::amqp::AMQPConnectionInf;
+use crate::backend::backend::Backend;
 
 
+#[derive(Clone, Debug)]
 pub enum QueuePersistenceType{
     PERSISTENT,
     NONPERSISTENT
 }
 
+
+#[derive(Clone, Debug)]
 pub enum BackendType{
     RPC,
     REDIS
 }
 
 
+#[derive(Clone, Debug)]
 pub enum BrokerType{
     RABBITMQ,
 }
 
 
+#[derive(Clone, Debug)]
 pub enum ExchangeType{
     DIRECT,
     FANOUT,
@@ -30,16 +36,18 @@ pub enum ExchangeType{
 }
 
 
+#[derive(Clone, Debug)]
 pub struct Admin{
     name: String,
     email: String,
 }
 
 
+#[derive(Clone, Debug)]
 pub struct CeleryConfig{
     pub connection_inf: AMQPConnectionInf,
     pub broker_connection_retry: bool,
-    pub result_backend: String,
+    pub result_backend: Backend,
     pub celery_cache_backend: Option<String>,
     pub send_events: bool,
     pub queues: Vec<String>,
@@ -93,7 +101,7 @@ pub struct CeleryConfig{
 
 impl CeleryConfig{
 
-    pub fn new(broker_inf: AMQPConnectionInf, backend: String) -> CeleryConfig{
+    pub fn new(broker_inf: AMQPConnectionInf, backend: Backend) -> CeleryConfig{
         CeleryConfig{
             connection_inf: broker_inf,
             broker_connection_retry: true,
@@ -167,7 +175,8 @@ mod tests {
             Some(String::from("rtp*4500")),
             false
         );
-        let c = CeleryConfig::new(broker_conf, "testurl".to_string());
+        let b = Backend{};
+        let c = CeleryConfig::new(broker_conf, b);
         let url = c.connection_inf.to_url();
         assert!(url.eq("amqp://dev:rtp*4500@127.0.0.1:5672/test"))
     }

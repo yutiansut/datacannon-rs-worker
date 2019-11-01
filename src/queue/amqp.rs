@@ -5,7 +5,7 @@ Author Andrew Evans
 */
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AMQPConnectionInf{
     protocol: String,
     host: String,

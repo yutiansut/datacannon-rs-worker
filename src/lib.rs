@@ -8,3 +8,4 @@ pub mod config;
 pub mod serde_utils;
 pub mod argparse;
 pub mod json;
+pub mod client;

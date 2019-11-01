@@ -30,7 +30,7 @@ pub struct ThreadableRabbitMQConnectionPool{
 impl ThreadableRabbitMQConnectionPool{
 
     /// Get the current pool size
-    fn get_current_pool_size(&self) -> usize{
+    pub fn get_current_pool_size(&self) -> usize{
         self.current_size.clone()
     }
 
@@ -41,7 +41,7 @@ impl ThreadableRabbitMQConnectionPool{
     }
 
     /// Get a connection from the pool
-    fn get_connection(&mut self) -> Result<ThreadableRabbitMQConnection, PoolIsEmptyError>{
+    pub fn get_connection(&mut self) -> Result<ThreadableRabbitMQConnection, PoolIsEmptyError>{
         if self.active_connections.is_empty(){
             Err(PoolIsEmptyError)
         }else{
@@ -52,12 +52,12 @@ impl ThreadableRabbitMQConnectionPool{
     }
 
     /// Create a connection for the pool
-    fn create_connection(&mut self) -> Result<ThreadableRabbitMQConnection, &'static str>{
+    pub fn create_connection(&mut self) -> Result<ThreadableRabbitMQConnection, &'static str>{
         self.conn_factory.create_threadable_connection()
     }
 
     /// Add a connection
-    fn add_connection(&mut self){
+    pub fn add_connection(&mut self){
         let rconn = self.create_connection();
         if rconn.is_ok(){
             let conn = rconn.ok().unwrap();
@@ -67,7 +67,7 @@ impl ThreadableRabbitMQConnectionPool{
     }
 
     /// Start the connection
-    fn start(&mut self) {
+    pub fn start(&mut self) {
         if self.active_connections.len() == 0{
             for i in 0..self.initial_size{
                 self.add_connection();
@@ -76,7 +76,7 @@ impl ThreadableRabbitMQConnectionPool{
     }
 
     /// close the pool
-    fn close_pool(&mut self){
+    pub fn close_pool(&mut self){
         for i in 0 .. self.active_connections.len(){
             let conn = self.active_connections.pop();
             conn.unwrap().connection.close();
@@ -84,7 +84,7 @@ impl ThreadableRabbitMQConnectionPool{
     }
 
     /// Create a new connection pool
-    fn new(conn_inf: AMQPConnectionInf, min_connections: usize) -> ThreadableRabbitMQConnectionPool{
+    pub fn new(conn_inf: AMQPConnectionInf, min_connections: usize) -> ThreadableRabbitMQConnectionPool{
         let factory = RabbitMQConnectionFactory::new(conn_inf.clone());
         let active_connections: Vec<ThreadableRabbitMQConnection> = Vec::<ThreadableRabbitMQConnection>::new();
         ThreadableRabbitMQConnectionPool{

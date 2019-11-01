@@ -52,6 +52,7 @@ impl Headers{
         jmap.insert(String::from("root_id"), AmqpValue::LongString(self.root_id.clone()));
         jmap.insert(String::from("parent_id"), AmqpValue::LongString(self.parent_id.clone()));
         jmap.insert(String::from("group"), AmqpValue::LongString(self.group.clone()));
+        jmap.insert(String::from("correlation_id"), AmqpValue::LongString(self.root_id.clone()));
 
         if self.meth.is_some() {
             let v = self.meth.clone().unwrap();
