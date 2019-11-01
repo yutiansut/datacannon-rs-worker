@@ -5,6 +5,7 @@ Author Andrew Evans
 */
 
 
+/// Struct for connection information
 #[derive(Clone, Debug)]
 pub struct AMQPConnectionInf{
     protocol: String,
@@ -16,6 +17,8 @@ pub struct AMQPConnectionInf{
     is_ssl: bool,
 }
 
+
+/// Implementation of the connection information
 impl AMQPConnectionInf{
 
     pub fn get_protocol(&self) -> String{
@@ -76,7 +79,7 @@ impl AMQPConnectionInf{
 
 #[cfg(test)]
 mod tests{
-    use crate::queue::amqp::AMQPConnectionInf;
+    use crate::amqp::amqp::AMQPConnectionInf;
 
     #[test]
     pub fn test_create_url(){

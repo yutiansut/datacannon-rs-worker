@@ -1,9 +1,10 @@
 /// The configuration object
 /// Author: Andrew Evans
 
+use amiquip::ExchangeType;
 use num_cpus;
 use std::collections::HashMap;
-use crate::queue::amqp::AMQPConnectionInf;
+use crate::amqp::amqp::AMQPConnectionInf;
 use crate::backend::backend::Backend;
 
 
@@ -24,15 +25,6 @@ pub enum BackendType{
 #[derive(Clone, Debug)]
 pub enum BrokerType{
     RABBITMQ,
-}
-
-
-#[derive(Clone, Debug)]
-pub enum ExchangeType{
-    DIRECT,
-    FANOUT,
-    TOPIC,
-    HEADERS,
 }
 
 
@@ -109,13 +101,13 @@ impl CeleryConfig{
             celery_cache_backend: None,
             send_events: false,
             queues: Vec::<String>::new(),
-            default_exchange_type: ExchangeType::DIRECT,
+            default_exchange_type: ExchangeType::Direct,
             default_queue: String::from("celery"),
             broadcast_exchange: String::from("celeryctl"),
-            broadcast_exchange_type: ExchangeType::FANOUT,
+            broadcast_exchange_type: ExchangeType::Fanout,
             event_queue: String::from("celeryevent"),
             event_exchange: String::from("celery_event"),
-            event_exchange_type: ExchangeType::TOPIC,
+            event_exchange_type: ExchangeType::Topic,
             event_routing_key: String::from("celeryevent"),
             event_serializer: String::from("json"),
             result_exchange: String::from("celeryresult"),

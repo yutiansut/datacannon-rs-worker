@@ -54,7 +54,7 @@ impl RabbitMQClient{
 mod tests{
     use crate::client::client::RabbitMQClient;
     use crate::config::config::CeleryConfig;
-    use crate::queue::amqp::AMQPConnectionInf;
+    use crate::amqp::amqp::AMQPConnectionInf;
     use crate::backend::backend::Backend;
 
     #[test]
