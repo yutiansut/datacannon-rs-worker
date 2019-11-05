@@ -1,5 +1,5 @@
 /*
-Implementation of available brokers
+Implementation of available brokers in a non-asynchronous manner.
 
 Author Andrew Evans
 */
@@ -9,19 +9,17 @@ use std::collections::BTreeMap;
 use std::env::Args;
 use std::iter::Map;
 
+use celery_rs_core::amqp::amqp::AMQPConnectionInf;
+use celery_rs_core::argparse::kwargs::KwArgs;
+use celery_rs_core::amqp::{queue_error::QueueError, publish_error::PublishError, exchange_error::ExchangeError};
+use celery_rs_core::message_protocol::{message_body::MessageBody, properties::Properties, headers::Headers, message::Message};
+use celery_rs_core::task::config::TaskConfig;
 use amiquip::{AmqpProperties, AmqpValue, Channel, Publish, QueueDeclareOptions, Queue, ExchangeDeclareOptions, Exchange, ExchangeType, FieldTable};
 use serde_json::{Value, to_string};
 
-use crate::amqp::{queue_error::QueueError, publish_error::PublishError, exchange_error::ExchangeError};
-use crate::argparse::kwargs::KwArgs;
-use crate::broker::headers::Headers;
-use crate::broker::message_body::MessageBody;
-use crate::broker::properties::Properties;
 use crate::config::config::{CeleryConfig};
 use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
 use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
-use crate::amqp::amqp::AMQPConnectionInf;
-use crate::task::config::TaskConfig;
 use std::error::Error;
 use serde_json::map::Values;
 
@@ -163,7 +161,7 @@ mod tests {
     use super::*;
 
     use crate::config::config::CeleryConfig;
-    use crate::amqp::amqp::AMQPConnectionInf;
+    use celery_rs_core::amqp::amqp::AMQPConnectionInf;
     use crate::backend::backend::Backend;
     use crate::broker::broker::{RabbitMQBroker, AMQPBroker};
     use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;

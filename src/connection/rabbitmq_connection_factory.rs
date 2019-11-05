@@ -8,7 +8,7 @@ use amiquip::{Channel, Connection};
 use crate::connection::rabbitmq_connection_utils;
 use crate::connection::rabbitmq_connection_utils::RabbitMQConnection;
 use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
-use crate::amqp::amqp::AMQPConnectionInf;
+use celery_rs_core::amqp::amqp::AMQPConnectionInf;
 
 ///Credentials object
 pub struct Credential{

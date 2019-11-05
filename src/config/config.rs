@@ -4,7 +4,7 @@
 use amiquip::ExchangeType;
 use num_cpus;
 use std::collections::HashMap;
-use crate::amqp::amqp::AMQPConnectionInf;
+use celery_rs_core::amqp::amqp::AMQPConnectionInf;
 use crate::backend::backend::Backend;
 
 
