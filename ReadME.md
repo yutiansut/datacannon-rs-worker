@@ -2,6 +2,13 @@
 
 A rust celery worker and client for building projects with using the celery protocol.
 
+## Current Support
+
+A Kombu-like port will need to be written for this library. Until then, RabbitMQ and 
+anything supporting AMQP will work as a broker. Backends use the BackendConfig.
+
+I really need this library for an existing time-sensitive project though.
+
 ## License
 
 Copyright 2019- Andrew Evans

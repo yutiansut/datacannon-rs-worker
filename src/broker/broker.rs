@@ -7,22 +7,21 @@ Author Andrew Evans
 use std::any::Any;
 use std::collections::BTreeMap;
 use std::env::Args;
+use std::error::Error;
 use std::iter::Map;
 
+use amiquip::{AmqpProperties, AmqpValue, Channel, Exchange, ExchangeDeclareOptions, ExchangeType, FieldTable, Publish, Queue, QueueDeclareOptions};
+use celery_rs_core::amqp::{exchange_error::ExchangeError, publish_error::PublishError, queue_error::QueueError};
 use celery_rs_core::amqp::amqp::AMQPConnectionInf;
 use celery_rs_core::argparse::kwargs::KwArgs;
-use celery_rs_core::amqp::{queue_error::QueueError, publish_error::PublishError, exchange_error::ExchangeError};
-use celery_rs_core::message_protocol::{message_body::MessageBody, properties::Properties, headers::Headers, message::Message};
+use celery_rs_core::config::config::CeleryConfig;
+use celery_rs_core::message_protocol::{headers::Headers, message::Message, message_body::MessageBody, properties::Properties};
 use celery_rs_core::task::config::TaskConfig;
-use amiquip::{AmqpProperties, AmqpValue, Channel, Publish, QueueDeclareOptions, Queue, ExchangeDeclareOptions, Exchange, ExchangeType, FieldTable};
-use serde_json::{Value, to_string};
-
-use crate::config::config::{CeleryConfig};
-use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
-use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
-use std::error::Error;
+use serde_json::{to_string, Value};
 use serde_json::map::Values;
 
+use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
+use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
 
 /// RabbitMQ Broker
 pub struct RabbitMQBroker{
@@ -158,15 +157,17 @@ impl RabbitMQBroker{
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    use crate::config::config::CeleryConfig;
-    use celery_rs_core::amqp::amqp::AMQPConnectionInf;
-    use crate::backend::backend::Backend;
-    use crate::broker::broker::{RabbitMQBroker, AMQPBroker};
-    use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
-    use uuid::Uuid;
     use amq_protocol::frame::AMQPFrameType::Header;
+    use celery_rs_core::amqp::amqp::AMQPConnectionInf;
+    use celery_rs_core::config::config::CeleryConfig;
+    use uuid::Uuid;
+
+    use crate::backend::backend::Backend;
+    use crate::broker::broker::{AMQPBroker, RabbitMQBroker};
+    use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
+
+    use super::*;
+    use celery_rs_core::backend::config::BackendConfig;
 
     fn get_config() -> CeleryConfig {
         let protocol = "amqp".to_string();
@@ -176,7 +177,12 @@ mod tests {
         let username = Some("dev".to_string());
         let password = Some("rtp*4500".to_string());
         let broker_conn = AMQPConnectionInf::new(protocol, host, port, vhost, username, password, false);
-        let backend = Backend{};
+        let backend = BackendConfig{
+            url: "rpc://".to_string(),
+            username: None,
+            password: None,
+            transport_options: None,
+        };
         let conf = CeleryConfig::new(broker_conn, backend);
         conf
     }
