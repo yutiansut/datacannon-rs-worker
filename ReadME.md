@@ -1,6 +1,6 @@
-# Celery-RS
+# Celery-RS Worker
 
-A rust celery worker and client for building projects with using the celery protocol.
+A rust celery worker for building tasks around other celery implementations.
 
 ## Current Support
 
