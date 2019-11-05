@@ -45,7 +45,7 @@ pub trait AMQPBroker{
     fn create_exchange(config: CeleryConfig, channel: &Channel, durable: bool, exchange: String, exchange_type: ExchangeType) -> Result<bool, ExchangeError>;
 
     /// send task to the broker
-    fn send_task(config: CeleryConfig, channel: &Channel, task: String, props: Properties, headers: Headers, body: MessageBody, exchange: Option<String>, routing_key: Option<String>) -> Result<bool, PublishError>;
+    fn send_task(config: CeleryConfig, channel: &Channel, props: Properties, headers: Headers, body: MessageBody, exchange: Option<String>, routing_key: Option<String>) -> Result<bool, PublishError>;
 }
 
 
@@ -112,7 +112,7 @@ impl AMQPBroker for RabbitMQBroker{
     }
 
     /// send a task to the broker
-    fn send_task(config: CeleryConfig, channel: &Channel, task: String, props: Properties, headers: Headers, body: MessageBody, exchange: Option<String>, routing_key: Option<String>) -> Result<bool, PublishError> {
+    fn send_task(config: CeleryConfig, channel: &Channel, props: Properties, headers: Headers, body: MessageBody, exchange: Option<String>, routing_key: Option<String>) -> Result<bool, PublishError> {
         let cfg = config.clone();
         let mut amq_properties = props.convert_to_amqp_properties();
         let amq_headers = headers.convert_to_btree_map();
@@ -168,6 +168,7 @@ mod tests {
     use crate::broker::broker::{RabbitMQBroker, AMQPBroker};
     use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
     use uuid::Uuid;
+    use amq_protocol::frame::AMQPFrameType::Header;
 
     fn get_config() -> CeleryConfig {
         let protocol = "amqp".to_string();
@@ -204,11 +205,54 @@ mod tests {
 
     #[test]
     fn should_create_and_bind_queue_to_exchange(){
-
+        let conf = get_config();
+        let rmq = RabbitMQBroker::new(conf.clone());
+        let conn_inf = conf.connection_inf.clone();
+        let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 2);
+        pool.start();
+        let rconn = pool.get_connection();
+        if rconn.is_ok(){
+            let mut c = rconn.unwrap();
+            let channel = c.connection.open_channel(None).unwrap();
+            let uuid = format!("{}", Uuid::new_v4());
+            let rq = RabbitMQBroker::create_queue(conf.clone(), &channel, true, String::from("test_queue"), true, uuid, Some("test_exchange".to_string()), Some("test_routing_key".to_string()));
+            RabbitMQBroker::bind_to_exchange(conf.clone(), &channel,  "test_exchange".to_string(), "test_queue".to_string(), "test_routing_key".to_string());
+            c.connection.close();
+            assert!(rq.is_ok());
+        }else{
+            assert!(false);
+        }
     }
 
     #[test]
     fn should_send_task_to_queue(){
+        let conf = get_config();
+        let rmq = RabbitMQBroker::new(conf.clone());
+        let conn_inf = conf.connection_inf.clone();
+        let mut pool = ThreadableRabbitMQConnectionPool::new(conn_inf, 2);
+        pool.start();
+        let rconn = pool.get_connection();
+        if rconn.is_ok(){
+            let mut c = rconn.unwrap();
+            let channel = c.connection.open_channel(None).unwrap();
+            let uuid = format!("{}", Uuid::new_v4());
 
+            // create queue if necessary
+            let rq = RabbitMQBroker::create_queue(conf.clone(), &channel, true, String::from("test_queue"), true, uuid, Some("test_exchange".to_string()), Some("test_routing_key".to_string()));
+
+            // create and send task
+            let body = MessageBody::new(None, None, None, None);
+            let uuid = Uuid::new_v4();
+            let ustr = format!("{}", uuid);
+            let headers = Headers::new("rs".to_string(), "test_task".to_string(), ustr.clone(), ustr.clone());
+            let reply_queue = Uuid::new_v4();
+            let props = Properties::new(ustr.clone(), "application/json".to_string(), "utf-8".to_string(), None);
+            let br = RabbitMQBroker::send_task(conf, &channel,props, headers, body, Some("test_exchange".to_string()), Some("test_routing_key".to_string()));
+            c.connection.close();
+            assert!(br.is_ok());
+            assert!(rq.is_ok());
+        }else{
+            assert!(false);
+        }
     }
 }

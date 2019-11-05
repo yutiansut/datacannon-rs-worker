@@ -14,6 +14,8 @@ pub struct Properties{
     pub content_type: String,
     pub content_encoding: String,
     pub reply_to: Option<String>,
+    pub priority: u8,
+    pub delivery_mode: u8,
 }
 
 
@@ -28,6 +30,8 @@ impl Properties{
         props = props.with_correlation_id(self.correlation_id.clone());
         props = props.with_content_type(self.content_type.clone());
         props = props.with_content_encoding(self.content_encoding.clone());
+        props = props.with_priority(self.priority.clone());
+        props = props.with_delivery_mode(self.delivery_mode);
         if self.reply_to.is_some() {
             let rt = self.reply_to.clone().unwrap();
             props = props.with_reply_to(rt);
@@ -42,6 +46,8 @@ impl Properties{
             content_type: content_type,
             content_encoding: content_encoding,
             reply_to: reply_to,
+            priority: 0,
+            delivery_mode: 2,
         }
     }
 }

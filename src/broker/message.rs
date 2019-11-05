@@ -90,7 +90,7 @@ mod tests{
         let content_type = String::from("test_content");
         let content_encoding = String::from("test_encoding");
         let props = Properties::new(correlation_id, content_type, content_encoding, None);
-        let mut h = Headers::new(String::from("rs"), String::from("test_task"), String::from("id"), String::from("test_root"), String::from("parent_id"), String::from("group"));
+        let mut h = Headers::new(String::from("rs"), String::from("test_task"), String::from("id"), String::from("test_root"));
         let arep = Args{
             args: Vec::<Arg>::new(),
         };
@@ -115,7 +115,7 @@ mod tests{
         let content_type = String::from("test_content");
         let content_encoding = String::from("test_encoding");
         let props = Properties::new(correlation_id, content_type, content_encoding, None);
-        let mut h = Headers::new(String::from("rs"), String::from("test_task"), String::from("id"), String::from("test_root"), String::from("parent_id"), String::from("group"));
+        let mut h = Headers::new(String::from("rs"), String::from("test_task"), String::from("id"), String::from("test_root"));
         let arep = Args{
             args: Vec::<Arg>::new(),
         };
