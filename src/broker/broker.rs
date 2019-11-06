@@ -20,8 +20,8 @@ use celery_rs_core::task::config::TaskConfig;
 use serde_json::{to_string, Value};
 use serde_json::map::Values;
 
-use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
-use crate::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
+use celery_rs_core::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
+use celery_rs_core::connection::threadable_rabbit_mq_connection::ThreadableRabbitMQConnection;
 
 /// RabbitMQ Broker
 pub struct RabbitMQBroker{
@@ -164,7 +164,7 @@ mod tests {
 
     use crate::backend::backend::Backend;
     use crate::broker::broker::{AMQPBroker, RabbitMQBroker};
-    use crate::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
+    use celery_rs_core::connection::rabbitmq_connection_pool::ThreadableRabbitMQConnectionPool;
 
     use super::*;
     use celery_rs_core::backend::config::BackendConfig;
