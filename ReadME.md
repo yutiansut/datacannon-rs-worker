@@ -9,6 +9,35 @@ anything supporting AMQP will work as a broker. Backends use the BackendConfig.
 
 I really need this library for an existing time-sensitive project though.
 
+## Features
+
+Existing features included in release 0.1:
+
+    - SSL support
+    - AMQP/RabbitMQ broker support
+    - Elastic Search backend Support
+    - Redis backend support
+    - Client and Workers
+    - Routing Key Support
+    - Message protocol support and serialization
+    - Identification matching Celery
+    - Threadable connections in worker ;)
+    - Tolio support in the clinet ;)
+    
+Features to include later (0.2+):
+
+    - Redis Broker support
+    - SQS Broker Support
+    - Creation of a messaging framework like Kombu
+    - All other backends
+    - OAuth2.0 support (RabbitMQ, Elasticsearch)
+    - monitoring support (PRIORITY)
+    - celerybeat support (PRIORITY)
+    - Rust implemented LevelDB Broker
+    - 1 to 1 feature matching with celery and maybe some extras
+
+Sorry guys, I am one man on a very specific mission.
+
 ## License
 
 Copyright 2019- Andrew Evans
