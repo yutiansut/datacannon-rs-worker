@@ -22,7 +22,7 @@ Existing features included in release 0.1:
     - Message protocol support and serialization
     - Identification matching Celery
     - Threadable connections in worker ;)
-    - Tolio support in the clinet ;)
+    - Tolio support in the client ;)
     
 Features to include later (0.2+):
 
